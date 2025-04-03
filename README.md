@@ -62,14 +62,13 @@ The parameters used [faiss](https://github.com/facebookresearch/faiss) to build 
 | CRAWL   | 400 |
 | DEEP100M | 400 |
 
-Build NSG index from kNN Graph:
-
+Build NSG index from kNN Graph:  
 You can use following command to build NSG index:
+
 ```bash
 cd [NSG_HOME]/build/tests
 ./test_nsg_index [dataset_path] [kNN_graph_path] [L] [R] [C] [nsg_index_path]
 ```
-
 + `L` controls the quality of the NSG, the larger the better.
 + `R` controls the index size of the graph, the best R is related to the intrinsic dimension of the dataset.
 + `C` controls the maximum candidate pool size during NSG contruction.
@@ -86,9 +85,8 @@ These are parameters used to build NSG index.
 To reproduce ADA-NNS (NSG) results:
 ```bash
 cd [NSG_HOME]/build/tests
-./test_nsg_optimized_search [dataset_path] [query_path] [groundtruth_path] [nsg_index_path] [ search_L] [search_K] [result_path] [num_threads] [tau] [hash_bitwidth] 
+./test_nsg_optimized_search [dataset_path] [query_path] [groundtruth_path] [nsg_index_path] [search_L] [search_K] [result_path] [num_threads] [tau] [hash_bitwidth] 
 ```
-
 + `SEARCH_L` controls the quality of the search results, the larger the better but slower. The `SEARCH_L` cannot be samller than the `SEARCH_K`
 + `SEARCH_K` controls the number of result neighbors we want to query.
 
