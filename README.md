@@ -50,7 +50,7 @@ cmake -DCMAKE_BUILD_TYPE=Release .. && make -j
 ### Million-scale Tests Reproduction
 Download datasets in the `dataset` directory
 
-Build kNN Graph:
+Build kNN Graph:  
 You can use either [efanna\_graph](https://github.com/ZJULearning/efanna\_graph) or [faiss](https://github.com/facebookresearch/faiss) to build this kNN graph.
 
 The parameters used [faiss](https://github.com/facebookresearch/faiss) to build each kNN graph is as follows:
