@@ -67,9 +67,9 @@ void save_result(const char* filename,
   out.close();
 }
 int main(int argc, char** argv) {
-  if (argc != 9) {
+  if (argc != 11) {
     std::cout << argv[0]
-              << " data_file query_file groundtruth_file nsg_path search_L search_K result_path num_threads"
+              << " data_file query_file groundtruth_file nsg_path search_L search_K result_path num_threads tau hash_bitwidth"
               << std::endl;
     exit(-1);
   }
@@ -99,7 +99,36 @@ int main(int argc, char** argv) {
   // query_num, query_dim);
   efanna2e::IndexNSG index(dim, points_num, efanna2e::FAST_L2, nullptr);
   index.Load(argv[4]);
+
+  // Sungjun Jung: Setting parameters for ADA-NNS
+  float tau = (float)atof(argv[9]);
+  uint64_t hash_bitwidth = (uint64_t)atoi(argv[10]);
+  index.SetHashBitwidth(hash_bitwidth);
+  index.SetTau(tau);
+
   index.OptimizeGraph(data_load);
+
+  // Sungjun Jung: Generate/Load data for ADA-NNS
+  char* hash_function_name = new char[strlen(argv[1]) + strlen(".hash_function_") + strlen(argv[10]) + 1];
+  char* hashed_set_name = new char[strlen(argv[1]) + strlen(".hashed_set") + strlen(argv[10]) + 1];
+  strcpy(hash_function_name, argv[1]);
+  strcat(hash_function_name, ".hash_function_");
+  strcat(hash_function_name, argv[10]);
+  strcat(hash_function_name, "b");
+  strcpy(hashed_set_name, argv[1]);
+  strcat(hashed_set_name, ".hashed_set_");
+  strcat(hashed_set_name, argv[10]);
+  strcat(hashed_set_name, "b");
+  if (index.ReadHashFunction(hash_function_name)) {
+    if (!index.ReadHashedSet(hashed_set_name))
+      index.GenerateHashedSet(hashed_set_name, data_load);
+  }
+  else {
+    index.GenerateHashFunction(hash_function_name);
+    index.GenerateHashedSet(hashed_set_name, data_load);
+  }
+  delete[] hash_function_name;
+  delete[] hashed_set_name;
 
   efanna2e::Parameters paras;
   paras.Set<unsigned>("L_search", L);
@@ -112,9 +141,12 @@ int main(int argc, char** argv) {
   omp_set_num_threads(num_threads);
 
   auto s = std::chrono::high_resolution_clock::now();
+  // Sungjun Jung: Hash query vector
+  uint32_t* hashed_query_buffer = (uint32_t*)malloc(query_num * (hash_bitwidth >> 3));
+  index.QueryHash(query_load, hashed_query_buffer, query_num);
 #pragma omp parallel for schedule(dynamic, 1)
   for (unsigned i = 0; i < query_num; i++) {
-    index.SearchWithOptGraph(query_load + i * dim, K, paras, res[i].data());
+    index.SearchWithOptGraph(query_load + i * dim, K, paras, res[i].data(), hashed_query_buffer + (hash_bitwidth >> 5) * i);
   }
   auto e = std::chrono::high_resolution_clock::now();
   std::chrono::duration<double> diff = e - s;
