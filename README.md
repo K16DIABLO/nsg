@@ -83,7 +83,7 @@ These are parameters used to build NSG index.
 To reproduce ADA-NNS (NSG) results:
 ```bash
 cd [NSG_HOME]/build/tests
-./test_nsg_optimized_search [dataset_path] [query_path] [groundtruth_path] [nsg_index_path] [search_L] [search_K] [result_path] [num_threads] [tau] [hash_bitwidth] 
+./test_nsg_optimized_search [dataset_path] [query_path] [groundtruth_path] [nsg_index_path] [search_L] [search_K] [result_path] [num_threads]
 ```
 + `SEARCH_L` controls the quality of the search results, the larger the better but slower. The `SEARCH_L` cannot be samller than the `SEARCH_K`
 + `SEARCH_K` controls the number of result neighbors we want to query.
