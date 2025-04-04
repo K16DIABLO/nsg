@@ -985,9 +985,8 @@ uint32_t IndexNSG::CandidateSelection (const float query_norm, const uint32_t* h
     }
 #else
     for (uint32_t num_integer = 0; num_integer < hash_bitwidth_ / (8 * sizeof(uint32_t)); num_integer++) {
-      uint32_t* hashed_set = (uint32_t*)(opt_graph_ + node_size * id + data_len + neighbor_len);
-      hamming_result[num_integer] = hashed_query[num_integer] ^ hashed_set[num_integer]; 
-      hamming_distance += __builtin_popcount(hamming_result[num_integer]);
+      hamming_result[0] = hashed_query[num_integer] ^ hashed_set_address[num_integer]; 
+      hamming_distance += __builtin_popcount(hamming_result[0]);
     }
 #endif
     float distance = - norm + 2 * mul_query_base * cosine_table[hamming_distance];
